@@ -1,8 +1,10 @@
 package com.example.forum.service;
 
 import com.example.forum.controller.form.CommentForm;
+import com.example.forum.controller.form.ReportForm;
 import com.example.forum.repository.CommentRepository;
 import com.example.forum.repository.entity.Comment;
+import com.example.forum.repository.entity.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +37,7 @@ public class CommentService {
     }
 
     /*
-     * reportIdに一致するcommentを取得
+     * レコード全件取得処理
      */
     public List<CommentForm> findAllComment() {
         List<Comment> results = commentRepository.findAll();
@@ -58,6 +60,16 @@ public class CommentService {
             comments.add(comment);
         }
         return comments;
+    }
+
+    /*
+     * レコード1件取得
+     */
+    public CommentForm editComment(Integer id) {
+        List<Comment> results = new ArrayList<>();
+        results.add((Comment) commentRepository.findById(id).orElse(null));
+        List<CommentForm> comments = setCommentForm(results);
+        return comments.get(0);
     }
 
 }

@@ -32,7 +32,7 @@
         </div>
         <div class="comment">
             <form th:action="@{/newComment/{id}(id=${content.id})}" th:method="post">
-                <label>コメント
+                <label>コメント :
                     <textarea class="tweet-box" name="content" size="20" maxlength="200" /></textarea><br/>
                     <input type="submit" value="投稿">
                 </label>
