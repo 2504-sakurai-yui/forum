@@ -72,4 +72,11 @@ public class CommentService {
         return comments.get(0);
     }
 
+    /*
+     *レコード削除
+     */
+    public void deleteComment(Integer id){
+        commentRepository.deleteById(id);
+    }
+
 }

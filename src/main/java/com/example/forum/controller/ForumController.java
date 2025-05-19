@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -32,8 +33,27 @@ public class ForumController {
         // 投稿データオブジェクトを保管
         mav.addObject("contents", contentData);
         mav.addObject("comments", commentData);
+
         return mav;
     }
+
+    /*
+     * 投稿絞り込み処理
+     */
+    @GetMapping("/narrowDown/{start}/{end}")
+    public ModelAndView narrowDownContent(@PathVariable Date start,
+                                          @PathVariable Date end) {
+        ModelAndView mav = new ModelAndView();
+        //startからendまでの投稿を取得
+        List<ReportForm> Date = reportService.findByStartToEnd(start, end);
+        ReportForm reportForm = new ReportForm();
+        mav.setViewName("/top");
+        mav.addObject("start", startDate);
+        mav.addObject("end", end);
+
+        return mav;
+    }
+
 
     /*
      * 新規投稿画面表示
@@ -129,17 +149,27 @@ public class ForumController {
      * コメント編集処理
      */
     @PutMapping("/updateComment/{id}/{reportId}")
-    public ModelAndView updateComment (@PathVariable int id,
-                                       @PathVariable int reportId,
+    public ModelAndView updateComment (@PathVariable Integer id,
+                                       @PathVariable Integer reportId,
                                        @ModelAttribute("formModel") CommentForm comment) {
         // UrlParameterのidを更新するentityにセット
-        //comment.setId(id);
-        //comment.setReportId(reportId);
+        comment.setId(id);
+        comment.setReportId(reportId);
         // 編集したコメントを更新
         commentService.saveComment(comment);
         // rootへリダイレクト
         return new ModelAndView("redirect:/");
     }
+
+    /*
+     * コメント削除処理
+     */
+    @DeleteMapping("/deleteComment/{id}")
+    public ModelAndView deleteComment(@PathVariable Integer id){
+        commentService.deleteComment(id);
+        return new ModelAndView("redirect:/");
+    }
+
 
 
 

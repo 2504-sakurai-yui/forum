@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -74,6 +75,16 @@ public class ReportService {
         results.add((Report) reportRepository.findById(id).orElse(null));
         List<ReportForm> reports = setReportForm(results);
         return reports.get(0);
+    }
+
+    /*
+     * startからend間のレコード全件取得処理
+     */
+    public List<ReportForm> findByStartToEnd(Date start, Date end) {
+        List<Report> results = reportRepository.findByCreatedDateBetween(start, end);
+        //Form煮詰めなおし
+        List<ReportForm> reports = setReportForm(results);
+        return reports;
     }
 
 }
