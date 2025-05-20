@@ -14,12 +14,12 @@
         <button class="new-button" type="button">新規投稿</button>
     </a>
     <div class="narrow-down">
-        <label>
-            日付 : <input type="date" th:value="${start}">
-            ～ <input type="date" th:value="${end}">
-        </label>
-        <form th:action="@{/narrowDown/{start}/{end}(start=${start}, end=${end})}">
-            <input type="button" value="絞込">
+        <form action="/">
+            <label>
+                日付 : <input type="date" name="start" th:object="${start}">
+                ～ <input type="date" name="end" th:object="${end}">
+            </label>
+            <input type="submit" value="絞込">
         </form>
     </div>
     <div class="message-icon" th:each="content : ${contents}">

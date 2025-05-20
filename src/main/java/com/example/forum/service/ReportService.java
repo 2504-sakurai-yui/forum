@@ -3,11 +3,17 @@ package com.example.forum.service;
 import com.example.forum.controller.form.ReportForm;
 import com.example.forum.repository.ReportRepository;
 import com.example.forum.repository.entity.Report;
+import io.micrometer.common.util.StringUtils;
+import org.hibernate.annotations.CurrentTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +43,8 @@ public class ReportService {
             Report result = results.get(i);
             report.setId(result.getId());
             report.setContent(result.getContent());
+            //report.setCreatedDate(result.getCreatedDate());
+            //report.setUpdatedDate(result.getUpdatedDate());
             reports.add(report);
         }
         return reports;
@@ -57,6 +65,8 @@ public class ReportService {
         Report report = new Report();
         report.setId(reqReport.getId());
         report.setContent(reqReport.getContent());
+        report.setCreatedDate(reqReport.getCreatedDate());
+        report.setUpdatedDate(reqReport.getUpdatedDate());
         return report;
     }
 
@@ -80,11 +90,65 @@ public class ReportService {
     /*
      * startからend間のレコード全件取得処理
      */
-    public List<ReportForm> findByStartToEnd(Date start, Date end) {
-        List<Report> results = reportRepository.findByCreatedDateBetween(start, end);
-        //Form煮詰めなおし
+    public List<ReportForm> findByStartToEnd(String start, String end) throws ParseException {
+        String startDate = start + " 00:00:00";
+        String endDate = end + " 23:59:59";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date dateStartDate = sdf.parse(startDate);
+        Date dateEndDate = sdf.parse(endDate);
+
+        List<Report> results = reportRepository.findAllByCreatedDateBetween(dateStartDate, dateEndDate);
+
+        //Formに詰めなおし
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
+
+    /*
+     * startのみ、endのみ入力されていた時
+     */
+    public List<ReportForm> findByDate(String start, String end) throws ParseException {
+        //startが入力されていた時
+        String startDate = null;
+        if(!StringUtils.isBlank(start)){
+            startDate = start + " 00:00:00";
+        } else {
+            startDate = "2020-01-01 00:00:00";
+        }
+
+        //endが入力されていた時
+        String endDate = null;
+        if(!StringUtils.isBlank(end)){
+            endDate = end + " 23:59:59";
+        } else {
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String now = String.valueOf(sdf.format(date));
+            endDate = now;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = sdf.parse(startDate);
+        Date date2 = sdf.parse(endDate);
+
+        List<Report> results = reportRepository.findAllByCreatedDateBetween(date,date2);
+        List<ReportForm> reports = setReportForm(results);
+        return reports;
+    }
+
+    /*
+     * コメント登録したとき投稿のupdated_date更新
+     */
+    public void saveReportUpdatedDate(Integer id) {
+        //Report saveReport = setReportEntityUpdate(reqReport);
+        reportRepository.saveByUpdatedDate(id);
+    }
+
+    /*private Report setReportEntityUpdate(ReportForm reqReport) {
+        Report report = new Report();
+        report.setUpdatedDate(reqReport.getUpdatedDate());
+        return report;
+    }*/
 
 }

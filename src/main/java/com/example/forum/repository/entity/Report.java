@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -21,13 +23,15 @@ public class Report {
     @Column
     private String content;
 
-    @Column
+    //@Column(columnDefinition = "TIMESTAMP")
+    @Column(insertable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
-    //@Column
-    //@Temporal(TemporalType.TIMESTAMP)
-    //private Date updatedDate;
+    //@Column(columnDefinition = "TIMESTAMP")
+    @Column(insertable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedDate;
 
 }
 

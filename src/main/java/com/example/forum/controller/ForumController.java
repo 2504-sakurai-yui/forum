@@ -1,14 +1,22 @@
 package com.example.forum.controller;
 
+import ch.qos.logback.core.model.Model;
 import com.example.forum.controller.form.CommentForm;
 import com.example.forum.controller.form.ReportForm;
+import com.example.forum.repository.entity.Report;
 import com.example.forum.service.CommentService;
 import com.example.forum.service.ReportService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,37 +31,33 @@ public class ForumController {
      * 投稿内容表示処理
      */
     @GetMapping
-    public ModelAndView top() {
+    public ModelAndView top(@RequestParam(name="start", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String start,
+                            @RequestParam(name="end", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String end) throws ParseException {
         ModelAndView mav = new ModelAndView();
-        // 投稿を全件取得
-        List<ReportForm> contentData = reportService.findAllReport();
+        List<ReportForm> contentData = new ArrayList<>();
+        //startとendに値が入ってたら日付で絞り込む
+        if(!StringUtils.isBlank(start) && !StringUtils.isBlank(end)) {
+            contentData = reportService.findByStartToEnd(start, end);
+        } else if(!StringUtils.isBlank(start)) {
+            contentData = reportService.findByDate(start, end);
+        } else if(!StringUtils.isBlank(end)) {
+            contentData = reportService.findByDate(start, end);
+        } else {
+            // 投稿を全件取得
+            contentData = reportService.findAllReport();
+        }
+        //コメントを全件取得
         List<CommentForm> commentData = commentService.findAllComment();
         // 画面遷移先を指定
         mav.setViewName("/top");
         // 投稿データオブジェクトを保管
         mav.addObject("contents", contentData);
         mav.addObject("comments", commentData);
-
-        return mav;
-    }
-
-    /*
-     * 投稿絞り込み処理
-     */
-    @GetMapping("/narrowDown/{start}/{end}")
-    public ModelAndView narrowDownContent(@PathVariable Date start,
-                                          @PathVariable Date end) {
-        ModelAndView mav = new ModelAndView();
-        //startからendまでの投稿を取得
-        List<ReportForm> Date = reportService.findByStartToEnd(start, end);
-        ReportForm reportForm = new ReportForm();
-        mav.setViewName("/top");
-        mav.addObject("start", startDate);
+        mav.addObject("start", start);
         mav.addObject("end", end);
 
         return mav;
     }
-
 
     /*
      * 新規投稿画面表示
@@ -126,7 +130,10 @@ public class ForumController {
     public ModelAndView commentContent (@PathVariable Integer id,
                                         @ModelAttribute("formModel") CommentForm comment) {
         comment.setReportId(id);
+        //ReportForm report = new ReportForm();
+        //report.setId(id);
         commentService.saveComment(comment);
+        reportService.saveReportUpdatedDate(id);
         return new ModelAndView("redirect:/");
     }
 
