@@ -27,7 +27,8 @@ public class ReportService {
      * レコード全件取得処理
      */
     public List<ReportForm> findAllReport() {
-        List<Report> results = reportRepository.findAllByOrderByIdDesc();
+        //List<Report> results = reportRepository.findAllByOrderByIdDesc();
+        List<Report> results = reportRepository.findAllByOrderByUpdatedDateDesc();
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
@@ -142,7 +143,7 @@ public class ReportService {
      */
     public void saveReportUpdatedDate(Integer id) {
         //Report saveReport = setReportEntityUpdate(reqReport);
-        reportRepository.saveByUpdatedDate(id);
+        int result = reportRepository.saveByUpdatedDate(id);
     }
 
     /*private Report setReportEntityUpdate(ReportForm reqReport) {
