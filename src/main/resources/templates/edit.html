@@ -10,13 +10,10 @@
     <h2>編集</h2>
 </div>
 <div class="main-contents">
-    <div class="errorMessage">
-        <div th:if="${errorMessages} != null">
-            <span th:text="${errorMessages}" />
-        </div>
-    </div>
-
     <form th:action="@{/update/{id}(id=${formModel.id})}" th:object="${formModel}" th:method="put">
+        <div class="errorMessage">
+            <p th:errors="*{content}"></p>
+        </div>
         <div class="form-area">
             <label>投稿内容</label>
             <textarea class="tweet-box" name="content" th:field="*{content}" size="20" maxlength="200" /></textarea><br/>
