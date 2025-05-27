@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.forum.mapper">
+    <resultMap id="Report" type="com.example.forum.entity.Report">
+        <result column="id" property="id" />
+        <result column="content" property="content" />
+    </resultMap>
+    <select id="findAllByOrderByUpdatedDateDesc" resultMap="Report">
+        select id, content
+        from report
+        order by updated_date desc
+    </select>
+</mapper>

@@ -147,6 +147,7 @@ public class ForumController {
             reportForm.setId(id);
             // 編集した投稿を更新
             reportService.saveReport(reportForm);
+            //reportService.updateReport(reportForm);
             // rootへリダイレクト
             return new ModelAndView("redirect:/");
         }

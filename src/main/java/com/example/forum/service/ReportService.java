@@ -1,19 +1,16 @@
 package com.example.forum.service;
 
 import com.example.forum.controller.form.ReportForm;
+import com.example.forum.mapper.TestMapper;
 import com.example.forum.repository.ReportRepository;
 import com.example.forum.repository.entity.Report;
 import io.micrometer.common.util.StringUtils;
-import org.hibernate.annotations.CurrentTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -22,13 +19,16 @@ public class ReportService {
 
     @Autowired
     ReportRepository reportRepository;
+    @Autowired
+    TestMapper testMapper;
 
     /*
      * レコード全件取得処理
      */
     public List<ReportForm> findAllReport() {
         //List<Report> results = reportRepository.findAllByOrderByIdDesc();
-        List<Report> results = reportRepository.findAllByOrderByUpdatedDateDesc();
+        //List<Report> results = reportRepository.findAllByOrderByUpdatedDateDesc();
+        List<Report> results = testMapper.findAllByOrderByUpdatedDateDesc();
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
@@ -56,7 +56,8 @@ public class ReportService {
      */
     public void saveReport(ReportForm reqReport) {
         Report saveReport = setReportEntity(reqReport);
-        reportRepository.save(saveReport);
+        //reportRepository.save(saveReport);
+        testMapper.save(saveReport);
     }
 
     /*
@@ -75,7 +76,8 @@ public class ReportService {
      *レコード削除
      */
     public void deleteReport(Integer id){
-        reportRepository.deleteById(id);
+        //reportRepository.deleteById(id);
+        testMapper.deleteById(id);
     }
 
     /*
@@ -83,7 +85,8 @@ public class ReportService {
      */
     public ReportForm editReport(Integer id) {
         List<Report> results = new ArrayList<>();
-        results.add((Report) reportRepository.findById(id).orElse(null));
+        //results.add((Report) reportRepository.findById(id).orElse(null));
+        results.add(testMapper.findById(id));
         List<ReportForm> reports = setReportForm(results);
         return reports.get(0);
     }
@@ -99,7 +102,8 @@ public class ReportService {
         Date dateStartDate = sdf.parse(startDate);
         Date dateEndDate = sdf.parse(endDate);
 
-        List<Report> results = reportRepository.findAllByCreatedDateBetween(dateStartDate, dateEndDate);
+        //List<Report> results = reportRepository.findAllByCreatedDateBetween(dateStartDate, dateEndDate);
+        List<Report> results = testMapper.findAllByCreatedDateBetween(dateStartDate, dateEndDate);
 
         //Formに詰めなおし
         List<ReportForm> reports = setReportForm(results);
@@ -133,7 +137,8 @@ public class ReportService {
         Date date = sdf.parse(startDate);
         Date date2 = sdf.parse(endDate);
 
-        List<Report> results = reportRepository.findAllByCreatedDateBetween(date,date2);
+        //List<Report> results = reportRepository.findAllByCreatedDateBetween(date,date2);
+        List<Report> results = testMapper.findAllByCreatedDateBetween(date, date2);
         List<ReportForm> reports = setReportForm(results);
         return reports;
     }
@@ -143,13 +148,8 @@ public class ReportService {
      */
     public void saveReportUpdatedDate(Integer id) {
         //Report saveReport = setReportEntityUpdate(reqReport);
-        int result = reportRepository.saveByUpdatedDate(id);
+        //int result = reportRepository.saveByUpdatedDate(id);
+        int result = testMapper.saveByUpdatedDate(id);
     }
-
-    /*private Report setReportEntityUpdate(ReportForm reqReport) {
-        Report report = new Report();
-        report.setUpdatedDate(reqReport.getUpdatedDate());
-        return report;
-    }*/
 
 }
